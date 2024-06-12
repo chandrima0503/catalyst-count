@@ -17,17 +17,13 @@ Follow these steps to run the app.
 
 7. Start the development server : python manage.py runserver
 
-8. Open the project's settings file: csv_uploader/settings.py. Locate the INSTALLED_APPS section and ensure that the following apps are included: INSTALLED_APPS = ['allauth','allauth.account']
+8. Register a new account and login
 
-9. Set up the authentication backend: AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend','allauth.account.auth_backends.AuthenticationBackend']
+9. Once logged in, navigate to the Upload Data section.
 
-10. Register a new account and login
+10. Click on the "Upload Data Tab" button and select a CSV file to upload.
 
-11. Once logged in, navigate to the Upload Data section.
-
-12. Click on the "Upload Data Tab" button and select a CSV file to upload.
-
-13. After the file is uploaded, perform the desired operations on the data.
+11. After the file is uploaded, perform the desired operations on the data.
 
 
 
