@@ -13,17 +13,23 @@ Follow these steps to run the app.
 
 5. run pip install -r requirements.txt
 
-6. Set up the database : python manage.py migrate
+6. update the .env with your credentials for database url and secret key.
+   DATABASE_URL=postgres://username:password@localhost:5432/catalyst_count
 
-7. Start the development server : python manage.py runserver
+7. generate a SECRET_KEY=""
 
-8. Register a new account and login
 
-9. Once logged in, navigate to the Upload Data section.
+8. Set up the database : python manage.py migrate
 
-10. Click on the "Upload Data Tab" button and select a CSV file to upload.
+9. Start the development server : python manage.py runserver
 
-11. After the file is uploaded, perform the desired operations on the data.
+10. Register a new account and login
+
+11. Once logged in, navigate to the Upload Data section.
+
+12. Click on the "Upload Data Tab" button and select a CSV file to upload.
+
+13. After the file is uploaded, perform the desired operations on the data.
 
 
 
