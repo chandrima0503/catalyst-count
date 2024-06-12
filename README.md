@@ -21,5 +21,13 @@ Follow these steps to run the app.
 
 9. Set up the authentication backend: AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend','allauth.account.auth_backends.AuthenticationBackend']
 
+10. Register a new account and login
+
+11. Once logged in, navigate to the Upload Data section.
+
+12. Click on the "Upload Data Tab" button and select a CSV file to upload.
+
+13. After the file is uploaded, perform the desired operations on the data.
+
 
 
