@@ -1,0 +1,67 @@
+<!-- base.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Catalyst_Count</title>
+    <!-- Add Bootstrap CSS link -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <!-- Navigation Menu -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <!-- Check if the user is authenticated -->
+                {% if user.is_authenticated %}
+                    <!-- Display logout button -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'upload_data' %}">Upload Data</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'query_builder' %}">Query Builder</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'active_users' %}">Users</a>
+                    </li>
+                {% endif %}
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <!-- Check if the user is authenticated -->
+                {% if user.is_authenticated %}
+                    <!-- Display logout button -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                    </li>
+                {% else %}
+                    <!-- Display login and register buttons -->
+                    {% if request.resolver_match.url_name == 'login' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'signup' %}">Register</a>
+                        </li>
+                    {% elif request.resolver_match.url_name == 'signup' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        </li>
+                    {% endif %}
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <div class="container mt-4">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- Add Bootstrap JS scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
