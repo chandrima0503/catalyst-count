@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import environ
 import os
+from decouple import config
+
 env = environ.Env(
     # set casting, default value
     DEBUG=(bool, True)
@@ -37,7 +39,7 @@ DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = []
 
-SECRET_KEY = env("SECRET_KEY")
+SECRET_KEY = config('RECAPTCHA_PUBLIC_KEY')
 
 # Application definition
 
@@ -98,7 +100,14 @@ WSGI_APPLICATION = 'catalyst_count.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': env.db(),
+    'default': {
+        'ENGINE': config('DB_ENGINE', default='django.db.backends.sqlite3'),
+        'NAME': config('DB_NAME', default='db.sqlite3'),
+        'USER': config('DB_USER', default=''),
+        'PASSWORD': config('DB_PASSWORD', default=''),
+        'HOST': config('DB_HOST', default=''),
+        'PORT': config('DB_PORT', default=''),
+    }
 }
 
 
