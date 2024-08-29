@@ -39,7 +39,7 @@ DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = []
 
-SECRET_KEY = config('RECAPTCHA_PUBLIC_KEY')
+SECRET_KEY = config('SECRET_KEY')
 
 # Application definition
 
