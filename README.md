@@ -1,35 +1,53 @@
-# catalyst-count
-Django assignment for Catalyst
+# Catalyst Count
 
-Follow these steps to run the app.
+A Django-based web application for uploading, searching, and managing company data.
 
-1.Clone the repository 
+## Features
 
-2. Unzip the repo and navigate to cd catalyst-count
-   
-3. python -m venv venv
-   
-4. source venv/bin/activate for mac OR venv\Scripts\activate for windows
+- User authentication (signup, login, logout)
+- Upload company data via CSV (optimized for large files)
+- Search and filter companies by multiple fields
+- View active users
 
-5. run pip install -r requirements.txt
+## Setup
 
-6. update the .env with your credentials for database url and secret key.
-   DATABASE_URL=postgres://username:password@localhost:5432/catalyst_count
+1. **Clone the repository**
+2. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. **Configure your database** in `settings.py`
+4. **Apply migrations**
+   ```bash
+   python manage.py makemigrations
+   python manage.py migrate
+   ```
+5. **Create a superuser (optional)**
+   ```bash
+   python manage.py createsuperuser
+   ```
+6. **Run the development server**
+   ```bash
+   python manage.py runserver
+   ```
 
-7. generate a SECRET_KEY=""
+## Uploading Large CSV Files
 
+- The upload view supports large CSV files (tested with 100,000+ rows).
+- For best performance, the backend uses Django's `bulk_create` in batches.
+- Make sure your CSV columns match the expected fields:  
+  `name, domain, year founded, industry, size range, locality, country, linkedin url, current employee estimate, total employee estimate`
+- Data is parsed and cleaned before saving to the database.
 
-8. Set up the database : python manage.py migrate
+## Notes
 
-9. Start the development server : python manage.py runserver
+- For even faster uploads, PostgreSQL's `COPY` command can be used (see code comments).
+- Uploaded files are saved to `MEDIA_ROOT/uploads/`.
+- Temporary/processed files are not tracked by git (`.gitignore`).
 
-10. Register a new account and login
+## License
 
-11. Once logged in, navigate to the Upload Data section.
-
-12. Click on the "Upload Data Tab" button and select a CSV file to upload.
-
-13. After the file is uploaded, perform the desired operations on the data.
+MIT License
 
 
 
