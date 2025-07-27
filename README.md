@@ -1,35 +1,56 @@
-# catalyst-count
-Django assignment for Catalyst
+# Catalyst Count
 
-Follow these steps to run the app.
+A Django-based web application for uploading, searching, and managing company data.
 
-1.Clone the repository 
-
-2. Unzip the repo and navigate to cd catalyst-count
-   
-3. python -m venv venv
-   
-4. source venv/bin/activate for mac OR venv\Scripts\activate for windows
-
-5. run pip install -r requirements.txt
-
-6. update the .env with your credentials for database url and secret key.
-   DATABASE_URL=postgres://username:password@localhost:5432/catalyst_count
-
-7. generate a SECRET_KEY=""
+<img width="5632" height="2080" alt="image" src="https://github.com/user-attachments/assets/514fd2ac-4bfd-47de-b75e-51e3daa7627d" />
 
 
-8. Set up the database : python manage.py migrate
+## Features
 
-9. Start the development server : python manage.py runserver
+- User authentication (signup, login, logout)
+- Upload company data via CSV (optimized for large files)
+- Search and filter companies by multiple fields
+- View active users
 
-10. Register a new account and login
+## Setup
 
-11. Once logged in, navigate to the Upload Data section.
+1. **Clone the repository**
+2. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. **Configure your database** in `settings.py`
+4. **Apply migrations**
+   ```bash
+   python manage.py makemigrations
+   python manage.py migrate
+   ```
+5. **Create a superuser (optional)**
+   ```bash
+   python manage.py createsuperuser
+   ```
+6. **Run the development server**
+   ```bash
+   python manage.py runserver
+   ```
 
-12. Click on the "Upload Data Tab" button and select a CSV file to upload.
+## Uploading Large CSV Files
 
-13. After the file is uploaded, perform the desired operations on the data.
+- The upload view supports large CSV files (tested with 100,000+ rows).
+- For best performance, the backend uses Django's `bulk_create` in batches.
+- Make sure your CSV columns match the expected fields:  
+  `name, domain, year founded, industry, size range, locality, country, linkedin url, current employee estimate, total employee estimate`
+- Data is parsed and cleaned before saving to the database.
+
+## Notes
+
+- For even faster uploads, PostgreSQL's `COPY` command can be used (see code comments).
+- Uploaded files are saved to `MEDIA_ROOT/uploads/`.
+- Temporary/processed files are not tracked by git (`.gitignore`).
+
+## License
+
+MIT License
 
 
 
