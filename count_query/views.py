@@ -10,6 +10,7 @@ from django.views import View
 from django.http import JsonResponse
 from django.conf import settings
 from django.db.models import Q
+from django.db import transaction, connection
 
 from rest_framework.response import Response
 from rest_framework import viewsets
@@ -178,71 +179,72 @@ class UploadDataView(View):
             for chunk in file.chunks():
                 destination.write(chunk)
 
-        # Process the uploaded CSV file and fill the database in chunks
-        with open(file_path, 'r', encoding='latin-1') as csv_file:
-            csv_reader = csv.DictReader(csv_file)
-            chunk_size = 1000
-            chunk_data = []
-            for row in csv_reader:
-                # Process each row and prepare Company object
-                # You need to handle any field conversion or formatting here
-                if '+' in row['size range']:
-                    size_range = int(row['size range'].replace('+', ''))
-                    size_min = size_range
-                    size_max = None
-                elif '-' in row['size range']:
-                    size_min, size_max = map(int, row['size range'].split('-'))
-                locality = row['locality']
-                if locality:
-                    city=row['locality'].split(',')[0].replace("(", "").replace(")", "").replace("'", "").replace(" ", "")
-                    print(city)
-                    state=row['locality'].split(',')[1].replace("(", "").replace(")", "").replace("'", "").replace(" ", "")
-                year_founded = int(float(row['year founded'])) if row['year founded'] else None
-                company = Company(
-                    name=row['name'],
-                    domain=row['domain'],
-                    year_founded=year_founded,
-                    industry=row['industry'],
-                    size_min=size_min,
-                    size_max=size_max,
-                    city=city,
-                    state=state,
-                    country=row['country'],
-                    linkedin_url=row['linkedin url'],
-                    current_employee_estimate=row['current employee estimate'],
-                    total_employee_estimate=row['total employee estimate']
-                )
-                chunk_data.append(company)
+        # Use bulk_create for fast ORM-based insert
+        batch_size = 15000  # Adjust as needed
+        companies = []
+        with open(file_path, 'r', encoding='latin-1') as infile:
+            reader = csv.DictReader(infile)
+            for row in reader:
+                try:
+                    size_min = size_max = None
+                    if 'size range' in row and row['size range']:
+                        if '+' in row['size range']:
+                            try:
+                                size_min = int(row['size range'].replace('+', ''))
+                            except Exception:
+                                size_min = None
+                            size_max = None
+                        elif '-' in row['size range']:
+                            try:
+                                size_min, size_max = map(int, row['size range'].split('-'))
+                            except Exception:
+                                size_min = size_max = None
+                    city = state = None
+                    locality = row.get('locality', '')
+                    if locality and ',' in locality:
+                        parts = locality.split(',')
+                        city = parts[0].replace("(", "").replace(")", "").replace("'", "").replace(" ", "")
+                        if len(parts) > 1:
+                            state = parts[1].replace("(", "").replace(")", "").replace("'", "").replace(" ", "")
+                    year_founded = None
+                    try:
+                        year_founded = int(float(row['year founded'])) if row.get('year founded') else None
+                    except Exception:
+                        year_founded = None
+                    companies.append(Company(
+                        name=row.get('name', ''),
+                        domain=row.get('domain', ''),
+                        year_founded=year_founded,
+                        industry=row.get('industry', ''),
+                        size_min=size_min,
+                        size_max=size_max,
+                        city=city,
+                        state=state,
+                        country=row.get('country', ''),
+                        linkedin_url=row.get('linkedin url', ''),
+                        current_employee_estimate=row.get('current employee estimate', ''),
+                        total_employee_estimate=row.get('total employee estimate', ''),
+                    ))
+                except Exception as e:
+                    print(f"Skipping row due to error: {e}")
 
-                # If the chunk size is reached, save the data to the database
-                if len(chunk_data) == chunk_size:
-                    self.save_chunk_data(chunk_data)
-                    chunk_data = []
+                if len(companies) >= batch_size:
+                    self.save_chunk_data(companies)
+                    companies = []
 
-            # Save any remaining data
-            if chunk_data:
-                self.save_chunk_data(chunk_data)
+            # Save any remaining companies
+            if companies:
+                self.save_chunk_data(companies)
 
-        # Respond with JSON indicating successful upload
-        json_response = {'status': 'ok', 'message': 'File uploaded successfully'}
+        json_response = {'status': 'ok', 'message': 'File uploaded successfully (bulk_create)'}
         success_message = json_response['message']
         redirect_url = request.path + '?message=' + success_message.replace(' ', '+')
         return redirect(redirect_url)
 
     def save_chunk_data(self, chunk_data):
-        """
-        Save a chunk of data to the database.
-
-        This method should handle saving a chunk of data to the database, typically using bulk_create or a similar method.
-
-        Args:
-            chunk_data (list): The list of Company objects representing the chunk of data to be saved.
-
-        Returns:
-            None
-        """
         try:
-            Company.objects.bulk_create(chunk_data)
+            with transaction.atomic():
+                Company.objects.bulk_create(chunk_data, batch_size=5000)
         except Exception as e:
             print(f"Error saving chunk data: {e}")
 

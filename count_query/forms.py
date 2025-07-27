@@ -4,6 +4,7 @@ from django import forms
 from .models import Upload, Company
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from functools import lru_cache
 
 
 class NewUserForm(UserCreationForm):
@@ -22,8 +23,28 @@ class NewUserForm(UserCreationForm):
 
 class CompanySearchForm(forms.Form):
     keyword = forms.CharField(max_length=255, required=False)
-    industry = forms.ChoiceField(choices=[('', 'Industry')] + [(industry, industry) for industry in Company.objects.values_list('industry', flat=True).distinct().order_by('industry')], required=False)
-    year_founded = forms.ChoiceField(choices=[('', 'Year Founded')] + [(year_founded, year_founded) for year_founded in Company.objects.values_list('year_founded', flat=True).distinct().order_by('year_founded')], required=False)
-    city = forms.ChoiceField(choices=[('', 'City')] + [(city, city) for city in Company.objects.values_list('city', flat=True).distinct().order_by('city')], required=False)
-    state = forms.ChoiceField(choices=[('', 'State')] + [(state, state) for state in Company.objects.values_list('state', flat=True).distinct().order_by('state')], required=False)
-    country = forms.ChoiceField(choices=[('', 'Country')] + [(country, country) for country in Company.objects.values_list('country', flat=True).distinct().order_by('country')], required=False)
+    industry = forms.ChoiceField(choices=[('', 'Industry')], required=False)
+    year_founded = forms.ChoiceField(choices=[('', 'Year Founded')], required=False)
+    city = forms.ChoiceField(choices=[('', 'City')], required=False)
+    state = forms.ChoiceField(choices=[('', 'State')], required=False)
+    country = forms.ChoiceField(choices=[('', 'Country')], required=False)
+
+    @staticmethod
+    @lru_cache(maxsize=1)
+    def get_choices(field):
+        try:
+            values = Company.objects.values_list(field, flat=True).distinct().order_by(field)[:100]
+            return [(v, v) for v in values if v]
+        except Exception:
+            return []
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        try:
+            self.fields['industry'].choices = [('', 'Industry')] + self.get_choices('industry')
+            self.fields['year_founded'].choices = [('', 'Year Founded')] + self.get_choices('year_founded')
+            self.fields['city'].choices = [('', 'City')] + self.get_choices('city')
+            self.fields['state'].choices = [('', 'State')] + self.get_choices('state')
+            self.fields['country'].choices = [('', 'Country')] + self.get_choices('country')
+        except Exception:
+            pass

@@ -1,0 +1,12 @@
+*.pyc
+*.pyo
+__pycache__/
+venv/
+*.sqlite3
+*.log
+*.csv
+*.db
+/count_query/migrations/
+*.DS_Store
+*.pyc
+.env
