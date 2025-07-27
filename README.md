@@ -2,6 +2,9 @@
 
 A Django-based web application for uploading, searching, and managing company data.
 
+<img width="5632" height="2080" alt="image" src="https://github.com/user-attachments/assets/514fd2ac-4bfd-47de-b75e-51e3daa7627d" />
+
+
 ## Features
 
 - User authentication (signup, login, logout)
